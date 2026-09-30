@@ -1,3 +1,4 @@
 {
-  "python.defaultInterpreterPath": "${workspaceFolder}/BytHunter.venv/Scripts/python.exe"
+  "python.defaultInterpreterPath": "${workspaceFolder}/BytHunter.venv/Scripts/python.exe",
+  "python.dataScience.sendSelectionToInteractiveWindow": true
 }
