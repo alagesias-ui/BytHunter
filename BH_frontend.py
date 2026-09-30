@@ -54,10 +54,9 @@ pd.set_option("display.width", 1000)
 df = pd.read_sql_query("SELECT * FROM nemovitosti", engine)
 
 # TRANSFORM DATAFRAME
-columns = ['adId', 'subtype', 'price', 'pricePerSqm', 'usableArea', 'city', 'street', 'poiSchoolDistance', 'poiBusDistance','detailUrl']
+columns = ['subtype', 'price', 'pricePerSqm', 'usableArea', 'city', 'street', 'poiSchoolDistance', 'poiBusDistance','detailUrl']
 df_clean = df[columns].copy()
 df_clean.rename(columns={
-    'adId': 'Index',
     'subtype': 'Dispozice',
     'price': 'Cena',
     'pricePerSqm': 'Cena m2',
@@ -95,14 +94,41 @@ max_cena_m2_hodnota = int(
     round(df_clean[df_clean["Město"] == max_cena_m2_město]["Cena m2"].mean())
 )
 
+# MAIN CITY IN SOUTHERN BOHEMIA
+mean_cena_budějovice = round(df_clean[df_clean['Město'] == "České Budějovice"]["Cena m2"].mean())
+budějovice_počet_nabídek = df_clean[df_clean['Město'] == "České Budějovice"].shape[0]
+
 # STREAMLIT APP
+
+# INTRO
 st.title('BytHunter | Agregátor nemovitostí')
 st.header('Úvod', divider='rainbow')
 st.markdown("""
 BytHunter agreguje informace o nemovitostech v jižních čechách z různých zdrojů a poskytuje je do aplikace. Aplikace umožňuje vyhledávat a zobrazovat informace o nemovitostech, které jsou dostupné v různých zdrojích.
 \n Aplikace navíc umožňuje obsah personalizovat podle oblasti, ceny, nebo vzdálenosti od zastávky nebo školy.
 """)
+
+# ABSTRACT
 st.header('Základní přehled', divider='rainbow')
 st.markdown(f"""
-Aplikace zobrazuje celkem **{count_rows}** nemovitostí v jižních čechách. Ceny za metr čtvereční se pohybují od **{min_cena_m2}** do **{max_cena_m2}** Kč. Nejdražším městem je **{max_cena_m2_město}**, které za cenu bytu **{max_cena_m2_hodnota}** Kč nabízí **{max_cena_m2_počet_nabídek}** nabídek.
+Aplikace zobrazuje celkem **{count_rows}** nemovitostí v jižních čechách. Ceny za metr čtvereční se pohybují od **{min_cena_m2}** do **{max_cena_m2}** Kč. Nejdražším městem je **{max_cena_m2_město}**, které za průmernou cenu bytu **{max_cena_m2_hodnota}** Kč nabízí **{max_cena_m2_počet_nabídek}** nabídek.
+\n Nejvyhledávanější město, České Budějovice, aktuálně nabízí **{budějovice_počet_nabídek}** nabídek na byt za průměrnou cenu **{mean_cena_budějovice}** Kč.
 """)
+
+# TABLE
+st.dataframe(
+    df_clean,
+    column_config={
+        "Cena": st.column_config.NumberColumn(
+            "Cena",
+            format="%,d Kč",    # Přidá Kč a tisíce oddělí mezerou podle lokalizace
+        ),
+        "Cena m2": st.column_config.NumberColumn(
+            "Cena m2", format="%,d Kč/m²"
+        ),
+        "Výměra (m2)": st.column_config.NumberColumn(
+            "Výměra (m²)", format="%d m²"
+        ),
+    },
+    hide_index=True,  # Schová zbytečný číselný index vlevo
+)
