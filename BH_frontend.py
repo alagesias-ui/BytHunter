@@ -42,7 +42,6 @@ except Exception as e:
     st.error(f"Database connection failed: {e}")
     st.stop()
 
-#%%
 # DB QUERY
 engine = create_engine(f'postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
 
@@ -70,10 +69,40 @@ df_clean.rename(columns={
     }, inplace=True)
 df_clean.head()
 
-# CREATE DATAFRAME
+# VARIABLES
+count_rows = df_clean.shape[0]
+mean_cena = round(df_clean['Cena'].mean())
+max_cena = round(df_clean['Cena'].max())
+min_cena = round(df_clean['Cena'].min())
+mean_cena_m2 = round(df_clean['Cena m2'].mean())
+max_cena_m2 = round(df_clean['Cena m2'].max())
+min_cena_m2 = round(df_clean['Cena m2'].min())
 
-# TRANSOFORM DATAFRAME
+# MOST EXPENSIVE CITY
+# Nejdražší město na cenu m2
+max_cena_m2_město = (
+    df_clean.groupby("Město", as_index=False)["Cena m2"]
+    .mean()
+    .sort_values(by=["Cena m2"], ascending=False)["Město"]
+    .iloc[0]
+) 
 
-# CREATE FRONTEND STREAMLIT APP
+# Počet nabídek na nejdražší město
+max_cena_m2_počet_nabídek = df_clean[df_clean['Město'] == max_cena_m2_město].shape[0] 
 
-# %%
+# Cena bytu v nejdražším městě
+max_cena_m2_hodnota = int(
+    round(df_clean[df_clean["Město"] == max_cena_m2_město]["Cena m2"].mean())
+)
+
+# STREAMLIT APP
+st.title('BytHunter | Agregátor nemovitostí')
+st.header('Úvod', divider='rainbow')
+st.markdown("""
+BytHunter agreguje informace o nemovitostech v jižních čechách z různých zdrojů a poskytuje je do aplikace. Aplikace umožňuje vyhledávat a zobrazovat informace o nemovitostech, které jsou dostupné v různých zdrojích.
+\n Aplikace navíc umožňuje obsah personalizovat podle oblasti, ceny, nebo vzdálenosti od zastávky nebo školy.
+""")
+st.header('Základní přehled', divider='rainbow')
+st.markdown(f"""
+Aplikace zobrazuje celkem **{count_rows}** nemovitostí v jižních čechách. Ceny za metr čtvereční se pohybují od **{min_cena_m2}** do **{max_cena_m2}** Kč. Nejdražším městem je **{max_cena_m2_město}**, které za cenu bytu **{max_cena_m2_hodnota}** Kč nabízí **{max_cena_m2_počet_nabídek}** nabídek.
+""")
