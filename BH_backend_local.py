@@ -9,6 +9,9 @@ from pathlib import Path
 from psycopg2.extras import execute_values
 from sqlalchemy import create_engine
 from apify_client import ApifyClient
+from dotenv import load_dotenv #slouží k načtení proměnných prostředí
+
+load_dotenv()  # Načtení proměnných prostředí z .env souboru
 
 # POSTGRESQL LOGIN
 DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
@@ -16,6 +19,12 @@ DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "postgres")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASS = os.getenv("DB_PASS", "159753")
+APIFY_TOKEN = os.getenv("APIFY_TOKEN")
+
+if APIFY_TOKEN:
+    print(f"Apify token načten! (Začíná na: {APIFY_TOKEN[:7]}...)")
+else:
+    print("CHYBA: APIFY_TOKEN v .env souboru chybí nebo je prázdný!")
 
 try:
     # 2. Vytvoření síťového spojení do databáze
@@ -46,18 +55,18 @@ except Exception as e:
 engine = create_engine(f'postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
 
 # GET API DATA
-client = ApifyClient("apify_api_ACPNPpWucTeqdmh9oWYQahu4tDzXJk1S5dSx")
+client = ApifyClient(os.getenv("APIFY_TOKEN"))
 run_input = {
     "regionIds": ["1"],
     "transaction": "sale",  # Prodej
     "category": "apartment",  # Byty
     "subtypeCodes": ["6","7"],
-    "priceMin": 4500000,
+    "priceMin": 5000000,
     "priceMax": 7500000,
     "usableAreaMin": 60,
     "usableAreaMax": 120,
     "sort": "newest",
-    "maxListings": 100,
+    "maxListings": 200,
     "proxyConfiguration": {"useApifyProxy": True},
 }
 

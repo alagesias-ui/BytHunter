@@ -64,7 +64,7 @@ df_clean.rename(columns={
     'city': 'City',
     'street':'Street',
     'poiSchoolDistance': 'Distance to School (m)', 'poiBusDistance': 'Distance to Bus Stop (m)',
-    'detailUrl': 'Link'
+    'detailUrl': 'Link',
     }, inplace=True)
 df_clean['Street'] = df_clean['Street'].fillna(df_clean['City']) # U menších obcích se neobjevují názvy ulic, proto se do sloupce Street doplní název města.
 df_clean['Price'] = df_clean['Price']/1000000
@@ -78,6 +78,11 @@ min_cena = round(df_clean['Price'].min())
 mean_cena_m2 = round(df_clean['Price per m2'].mean())
 max_cena_m2 = round(df_clean['Price per m2'].max())
 min_cena_m2 = round(df_clean['Price per m2'].min())
+
+df['scrapedAt'] = pd.to_datetime(df['scrapedAt'])
+max_scraped_at = df['scrapedAt'].max()
+posledni_update = max_scraped_at.strftime("%d.%m.%Y v %H:%M")
+
 
 # MOST EXPENSIVE CITY
 # Nejdražší město na cenu m2
@@ -118,6 +123,7 @@ The application displays a total of **{count_rows}** properties in South Bohemia
 """)
 
 # TABLE
+st.caption(f"🕒 **Last updated:** {posledni_update}")
 st.dataframe(
     df_clean,
     column_config={
