@@ -57,77 +57,78 @@ df = pd.read_sql_query("SELECT * FROM nemovitosti", engine)
 columns = ['subtype', 'price', 'pricePerSqm', 'usableArea', 'city', 'street', 'poiSchoolDistance', 'poiBusDistance','detailUrl']
 df_clean = df[columns].copy()
 df_clean.rename(columns={
-    'subtype': 'Dispozice',
-    'price': 'Cena',
-    'pricePerSqm': 'Cena m2',
-    'usableArea': 'Výměra (m2)',
-    'city': 'Město',
-    'street':'Ulice',
-    'poiSchoolDistance': 'Vz. od školy (m)', 'poiBusDistance': 'Vz. od zastávky (m)',
-    'detailUrl': 'Odkaz'
+    'subtype': 'Layout',
+    'price': 'Price',
+    'pricePerSqm': 'Price per m2',
+    'usableArea': 'Usable Area (m2)',
+    'city': 'City',
+    'street':'Street',
+    'poiSchoolDistance': 'Distance to School (m)', 'poiBusDistance': 'Distance to Bus Stop (m)',
+    'detailUrl': 'Link'
     }, inplace=True)
+df_clean['Street'] = df_clean['Street'].fillna(df_clean['City']) # U menších obcích se neobjevují názvy ulic, proto se do sloupce Street doplní název města.
+df_clean['Price'] = df_clean['Price']/1000000
 df_clean.head()
 
 # VARIABLES
 count_rows = df_clean.shape[0]
-mean_cena = round(df_clean['Cena'].mean())
-max_cena = round(df_clean['Cena'].max())
-min_cena = round(df_clean['Cena'].min())
-mean_cena_m2 = round(df_clean['Cena m2'].mean())
-max_cena_m2 = round(df_clean['Cena m2'].max())
-min_cena_m2 = round(df_clean['Cena m2'].min())
+mean_cena = round(df_clean['Price'].mean())
+max_cena = round(df_clean['Price'].max())
+min_cena = round(df_clean['Price'].min())
+mean_cena_m2 = round(df_clean['Price per m2'].mean())
+max_cena_m2 = round(df_clean['Price per m2'].max())
+min_cena_m2 = round(df_clean['Price per m2'].min())
 
 # MOST EXPENSIVE CITY
 # Nejdražší město na cenu m2
 max_cena_m2_město = (
-    df_clean.groupby("Město", as_index=False)["Cena m2"]
+    df_clean.groupby("City", as_index=False)["Price per m2"]
     .mean()
-    .sort_values(by=["Cena m2"], ascending=False)["Město"]
+    .sort_values(by=["Price per m2"], ascending=False)["City"]
     .iloc[0]
 ) 
 
 # Počet nabídek na nejdražší město
-max_cena_m2_počet_nabídek = df_clean[df_clean['Město'] == max_cena_m2_město].shape[0] 
+max_cena_m2_počet_nabídek = df_clean[df_clean['City'] == max_cena_m2_město].shape[0] 
 
 # Cena bytu v nejdražším městě
 max_cena_m2_hodnota = int(
-    round(df_clean[df_clean["Město"] == max_cena_m2_město]["Cena m2"].mean())
+    round(df_clean[df_clean["City"] == max_cena_m2_město]["Price per m2"].mean())
 )
 
 # MAIN CITY IN SOUTHERN BOHEMIA
-mean_cena_budějovice = round(df_clean[df_clean['Město'] == "České Budějovice"]["Cena m2"].mean())
-budějovice_počet_nabídek = df_clean[df_clean['Město'] == "České Budějovice"].shape[0]
+mean_cena_budějovice = round(df_clean[df_clean['City'] == "České Budějovice"]["Price per m2"].mean())
+budějovice_počet_nabídek = df_clean[df_clean['City'] == "České Budějovice"].shape[0]
 
 # STREAMLIT APP
 
 # INTRO
-st.title('BytHunter | Agregátor nemovitostí')
-st.header('Úvod', divider='rainbow')
+st.title('BytHunter | Real Estate Aggregator for South Bohemia')
+st.header('Intro', divider='rainbow')
 st.markdown("""
-BytHunter agreguje informace o nemovitostech v jižních čechách z různých zdrojů a poskytuje je do aplikace. Aplikace umožňuje vyhledávat a zobrazovat informace o nemovitostech, které jsou dostupné v různých zdrojích.
-\n Aplikace navíc umožňuje obsah personalizovat podle oblasti, ceny, nebo vzdálenosti od zastávky nebo školy.
+BytHunter aggregates real estate information in South Bohemia from various sources and provides it to the application. The application allows users to search for and view property information available across different sources.
+\n In addition, the application allows content personalization based on region, price, or distance to a transit stop or school.
 """)
 
 # ABSTRACT
-st.header('Základní přehled', divider='rainbow')
+st.header('Basic Overview', divider='rainbow')
 st.markdown(f"""
-Aplikace zobrazuje celkem **{count_rows}** nemovitostí v jižních čechách. Ceny za metr čtvereční se pohybují od **{min_cena_m2}** do **{max_cena_m2}** Kč. Nejdražším městem je **{max_cena_m2_město}**, které za průmernou cenu bytu **{max_cena_m2_hodnota}** Kč nabízí **{max_cena_m2_počet_nabídek}** nabídek.
-\n Nejvyhledávanější město, České Budějovice, aktuálně nabízí **{budějovice_počet_nabídek}** nabídek na byt za průměrnou cenu **{mean_cena_budějovice}** Kč.
+The application displays a total of **{count_rows}** properties in South Bohemia. Prices per square meter range from **{min_cena_m2}** to **{max_cena_m2}** CZK. The most expensive city is **{max_cena_m2_město}**, which offers **{max_cena_m2_počet_nabídek}** listings at an average price of **{max_cena_m2_hodnota}** CZK.
+\n The most searched city, České Budějovice, currently offers **{budějovice_počet_nabídek}** listings for apartments at an average price of **{mean_cena_budějovice}** CZK.
 """)
 
 # TABLE
 st.dataframe(
     df_clean,
     column_config={
-        "Cena": st.column_config.NumberColumn(
-            "Cena",
-            format="%,d Kč",    # Přidá Kč a tisíce oddělí mezerou podle lokalizace
+        "Price": st.column_config.NumberColumn(
+                    "Price", format="%.2f mil Kč"
+                ),
+        "Price per m2": st.column_config.NumberColumn(
+            "Price per m2", format="%,d Kč/m²"
         ),
-        "Cena m2": st.column_config.NumberColumn(
-            "Cena m2", format="%,d Kč/m²"
-        ),
-        "Výměra (m2)": st.column_config.NumberColumn(
-            "Výměra (m²)", format="%d m²"
+        "Usable Area (m2)": st.column_config.NumberColumn(
+            "Usable Area (m²)", format="%d m²"
         ),
     },
     hide_index=True,  # Schová zbytečný číselný index vlevo
