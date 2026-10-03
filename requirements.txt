@@ -1,0 +1,7 @@
+streamlit
+pandas
+numpy
+altair
+psycopg2-binary
+sqlalchemy
+apify-client

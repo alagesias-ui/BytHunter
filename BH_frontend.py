@@ -130,6 +130,11 @@ st.dataframe(
         "Usable Area (m2)": st.column_config.NumberColumn(
             "Usable Area (m²)", format="%d m²"
         ),
+        "Link": st.column_config.LinkColumn(
+                    "Link",                     # Název sloupce v tabulce
+                    display_text="Otevřít 🔗",  # Co se zobrazí místo té dlouhé URL (volitelné)
+                    width="small"
+                ),
     },
     hide_index=True,  # Schová zbytečný číselný index vlevo
 )
