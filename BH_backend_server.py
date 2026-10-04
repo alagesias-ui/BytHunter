@@ -1,11 +1,12 @@
+# IMPORT LIBRARIES
 import os
 import pandas as pd
 from sqlalchemy import create_engine
 from apify_client import ApifyClient
 from dotenv import load_dotenv
 
-load_dotenv()
-
+# ENVIRONMENT VARIABLES
+load_dotenv() # Načítá proměnné prostředí z .env souboru
 DATABASE_URL = os.getenv("DATABASE_URL")
 APIFY_TOKEN = os.getenv("APIFY_TOKEN")
 
@@ -23,6 +24,7 @@ except Exception as e:
     print(f"Chyba při připojení k DB: {e}")
     exit()
 
+# CALL API
 client = ApifyClient(APIFY_TOKEN)
 run_input = {
     "regionIds": ["1"],
@@ -41,9 +43,11 @@ run_input = {
 print("Spouštím scraping Srealit...")
 run = client.actor("logiover/sreality-cz-scraper-czech-real-estate-data").call(run_input=run_input)
 
+# ASSIGN DATAFRAME
 dataset_items = client.dataset(run.default_dataset_id).list_items().items
 df = pd.DataFrame(dataset_items)
 
+# WRITE TO DATABASE
 if not df.empty:
     try:
         print("Zapisuji data do databáze...")
