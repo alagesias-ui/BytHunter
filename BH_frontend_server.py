@@ -122,3 +122,4 @@ st.dataframe(
     },
     hide_index=True,  # Schová zbytečný číselný index vlevo
 )
+st.caption(f"🕒 **Source:** sreality.cz")
