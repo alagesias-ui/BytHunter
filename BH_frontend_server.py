@@ -37,11 +37,11 @@ df_clean = df[columns].copy()
 df_clean.rename(columns={
     'subtype': 'Layout',
     'price': 'Price',
-    'pricePerSqm': 'Price per m2',
-    'usableArea': 'Usable Area (m2)',
+    'pricePerSqm': 'Price per m²',
+    'usableArea': 'Area (m²)',
     'city': 'City',
     'street':'Street',
-    'poiSchoolDistance': 'Distance to School (m)', 'poiBusDistance': 'Distance to Bus Stop (m)',
+    'poiSchoolDistance': 'Dis. to School (m)', 'poiBusDistance': 'Dis. to Bus Stop (m)',
     'detailUrl': 'Link',
     }, inplace=True)
 df_clean['Street'] = df_clean['Street'].fillna(df_clean['City']) # U menších obcích se neobjevují názvy ulic, proto se do sloupce Street doplní název města.
@@ -53,21 +53,21 @@ count_rows = df_clean.shape[0]
 mean_cena = round(df_clean['Price'].mean())
 max_cena = round(df_clean['Price'].max())
 min_cena = round(df_clean['Price'].min())
-mean_cena_m2 = round(df_clean['Price per m2'].mean())
-max_cena_m2 = round(df_clean['Price per m2'].max())
-min_cena_m2 = round(df_clean['Price per m2'].min())
+mean_cena_m2 = round(df_clean['Price per m²'].mean())
+max_cena_m2 = round(df_clean['Price per m²'].max())
+min_cena_m2 = round(df_clean['Price per m²'].min())
 
 df['scrapedAt'] = pd.to_datetime(df['scrapedAt'])
 max_scraped_at = df['scrapedAt'].max()
-posledni_update = max_scraped_at.strftime("%d.%m.%Y v %H:%M")
+posledni_update = max_scraped_at.strftime("%d.%m.%Y at %H:%M GMT+2")
 
 
 # MOST EXPENSIVE CITY
 # Nejdražší město na cenu m2
 max_cena_m2_město = (
-    df_clean.groupby("City", as_index=False)["Price per m2"]
+    df_clean.groupby("City", as_index=False)["Price per m²"]
     .mean()
-    .sort_values(by=["Price per m2"], ascending=False)["City"]
+    .sort_values(by=["Price per m²"], ascending=False)["City"]
     .iloc[0]
 ) 
 
@@ -76,11 +76,11 @@ max_cena_m2_počet_nabídek = df_clean[df_clean['City'] == max_cena_m2_město].s
 
 # Cena bytu v nejdražším městě
 max_cena_m2_hodnota = int(
-    round(df_clean[df_clean["City"] == max_cena_m2_město]["Price per m2"].mean())
+    round(df_clean[df_clean["City"] == max_cena_m2_město]["Price per m²"].mean())
 )
 
 # MAIN CITY IN SOUTHERN BOHEMIA
-mean_cena_budějovice = round(df_clean[df_clean['City'] == "České Budějovice"]["Price per m2"].mean())
+mean_cena_budějovice = round(df_clean[df_clean['City'] == "České Budějovice"]["Price per m²"].mean())
 budějovice_počet_nabídek = df_clean[df_clean['City'] == "České Budějovice"].shape[0]
 
 # STREAMLIT APP
@@ -96,8 +96,8 @@ BytHunter aggregates real estate information in South Bohemia from various sourc
 # ABSTRACT
 st.header('Basic Overview', divider='rainbow')
 st.markdown(f"""
-The application displays a total of **{count_rows}** properties in South Bohemia. Prices per square meter range from **{min_cena_m2}** to **{max_cena_m2}** CZK. The most expensive city is **{max_cena_m2_město}**, which offers **{max_cena_m2_počet_nabídek}** listings at an average price of **{max_cena_m2_hodnota}** CZK.
-\n The most searched city, České Budějovice, currently offers **{budějovice_počet_nabídek}** listings for apartments at an average price of **{mean_cena_budějovice}** CZK.
+The application displays a total of **{count_rows}** properties in South Bohemia. Prices per square meter range from **{min_cena_m2}** to **{max_cena_m2}** CZK. The most expensive city on average is **{max_cena_m2_město}**, which offers **{max_cena_m2_počet_nabídek}** listings at an average price of **{max_cena_m2_hodnota}** CZK.
+\n The regional capital city, České Budějovice, currently offers **{budějovice_počet_nabídek}** listings for apartments at an average price of **{mean_cena_budějovice}** CZK.
 """)
 
 # TABLE
@@ -108,11 +108,11 @@ st.dataframe(
         "Price": st.column_config.NumberColumn(
                     "Price", format="%.2f mil Kč"
                 ),
-        "Price per m2": st.column_config.NumberColumn(
-            "Price per m2", format="%,d Kč/m²"
+        "Price per m²": st.column_config.NumberColumn(
+            "Price per m²", format="%,d Kč/m²"
         ),
-        "Usable Area (m2)": st.column_config.NumberColumn(
-            "Usable Area (m²)", format="%d m²"
+        "Area (m²)": st.column_config.NumberColumn(
+            "Area (m²)", format="%d m²"
         ),
         "Link": st.column_config.LinkColumn(
                     "Link",                     # Název sloupce v tabulce
