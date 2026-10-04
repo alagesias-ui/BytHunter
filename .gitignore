@@ -1,1 +1,18 @@
+# HESLA
 .env
+
+# VIRTUÁLNÍ PROSTŘEDÍ
+BytHunter.venv/
+venv/
+env/
+
+# NASTAVENÍ EDITORU A CACHE
+.vscode/
+__pycache__/
+*.pyc
+
+# POMOCNÉ SOUBORY
+git_manual.md
+sreality_seznam_kraju.txt
+to_do.txt
+archive/
