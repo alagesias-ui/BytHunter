@@ -1,3 +1,0 @@
-projít jak lze používat skrytá hesla v kodu, abych je nepublikoval
-
-přepracovat databázi do neon, z lokálního pc deployment nepůjde
