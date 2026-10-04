@@ -32,11 +32,11 @@ run_input = {
     "category": "apartment",
     "subtypeCodes": ["6", "7"],
     "priceMin": 5000000,
-    "priceMax": 7500000,
+    "priceMax": 7800000,
     "usableAreaMin": 60,
     "usableAreaMax": 120,
     "sort": "newest",
-    "maxListings": 200,
+    "maxListings": 300,
     "proxyConfiguration": {"useApifyProxy": True},
 }
 
