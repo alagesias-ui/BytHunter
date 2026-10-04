@@ -11,7 +11,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 APIFY_TOKEN = os.getenv("APIFY_TOKEN")
 
 if not DATABASE_URL or not APIFY_TOKEN:
-    print("CHYBA: Chybí DATABASE_URL nebo APIFY_TOKEN v .env souboru!")
+    print("❌CHYBA: Chybí DATABASE_URL nebo APIFY_TOKEN v .env souboru!")
     exit()
 
 engine_url = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1).replace("postgres://", "postgresql+psycopg2://", 1)
@@ -19,9 +19,9 @@ engine = create_engine(engine_url)
 
 try:
     with engine.connect() as conn:
-        print("Úspěšně připojeno k Neon.tech databázi přes SQLAlchemy!")
+        print("✅Úspěšně připojeno k Neon.tech databázi přes SQLAlchemy!")
 except Exception as e:
-    print(f"Chyba při připojení k DB: {e}")
+    print(f"❌Chyba při připojení k DB: {e}")
     exit()
 
 # CALL API

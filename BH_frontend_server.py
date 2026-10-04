@@ -20,7 +20,7 @@ try:
     with engine.connect() as conn:
         print("Úspěšně připojeno k Neon.tech databázi přes SQLAlchemy!")
 except Exception as e:
-    print(f"Chyba při připojení k DB: {e}")
+    print(f"❌Chyba při připojení k DB: {e}")
     exit()
 
 # SET UP PANDAS RULES
