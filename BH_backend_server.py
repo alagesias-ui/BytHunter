@@ -47,20 +47,38 @@ run = client.actor("logiover/sreality-cz-scraper-czech-real-estate-data").call(r
 dataset_items = client.dataset(run.default_dataset_id).list_items().items
 df = pd.DataFrame(dataset_items)
 
-# WRITE TO DATABASE
+# WRITE TO HISTORICAL DATABASE (APPEND)
+if not df.empty:
+    try:
+        print("Zapisuji data do historické databáze...")
+        df["scrapedAt"] = pd.Timestamp.now()
+        df.to_sql(
+            name="sr_nemovitosti_hist",
+            con=engine,
+            if_exists="append",
+            index=False,
+            method="multi",
+        )
+        print("✅Data byla úspěšně zapsána do tabulky 'sr_nemovitosti_hist'!")
+    except Exception as e:
+        print(f"❌Chyba při zápisu do historické databáze: {e}")
+else:
+    print("❌DataFrame je prázdný, žádná data k zápisu do historické databáze.")
+
+# WRITE TO MAIN DATABASE (REPLACE)
 if not df.empty:
     try:
         print("Zapisuji data do databáze...")
         df["scrapedAt"] = pd.Timestamp.now()
         df.to_sql(
-            name="nemovitosti",
+            name="sr_nemovitosti",
             con=engine,
             if_exists="replace",
             index=False,
             method="multi",
         )
-        print("Data byla úspěšně zapsána do tabulky 'nemovitosti'!")
+        print("✅Data byla úspěšně zapsána do tabulky 'sr_nemovitosti'!")
     except Exception as e:
-        print(f"Chyba při zápisu do databáze: {e}")
+        print(f"❌Chyba při zápisu do databáze: {e}")
 else:
-    print("DataFrame je prázdný, žádná data k zápisu.")
+    print("❌DataFrame je prázdný, žádná data k zápisu do main databáze.")

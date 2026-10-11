@@ -29,7 +29,7 @@ pd.set_option("display.max_colwidth", None) # Maximální šířka sloupce bude 
 pd.set_option("display.width", 1000)
 
 # QUERY POSTGRESQL DATABASE
-df = pd.read_sql_query("SELECT * FROM nemovitosti", engine)
+df = pd.read_sql_query("SELECT * FROM sr_nemovitosti", engine)
 
 # TRANSFORM DATAFRAME
 columns = ['subtype', 'price', 'pricePerSqm', 'usableArea', 'city', 'street', 'poiSchoolDistance', 'poiBusDistance','detailUrl']
