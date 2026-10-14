@@ -46,6 +46,7 @@ run = client.actor("logiover/sreality-cz-scraper-czech-real-estate-data").call(r
 # ASSIGN DATAFRAME
 dataset_items = client.dataset(run.default_dataset_id).list_items().items
 df = pd.DataFrame(dataset_items)
+df["source"] = "Sreality"
 
 # WRITE TO HISTORICAL DATABASE (APPEND)
 if not df.empty:
