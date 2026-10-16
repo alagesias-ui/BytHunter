@@ -91,6 +91,10 @@ if not df.empty:
           else None
       )
 
+  # TVORBA PROMĚNNÝCH
+  df["source"] = df["source"].str.capitalize()
+  df["pricepersqm"] = (df["price"]/df["surface"]).round(0).astype(int) # Přidání sloupce pricePerSqm pro cenu za m²
+
   # 4. ZÁPIS DO HISTORICKÉ DATABÁZE (APPEND)
   try:
     print("Zapisuji data do historické tabulky (bz_nemovitosti_hist)...")
